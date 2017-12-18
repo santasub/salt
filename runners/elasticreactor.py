@@ -28,14 +28,16 @@ on the salt-master server.
      runner.elasticreactor.log_stuff:
        - data_str: {{ data|yaml_dquote }}
 
-Put this script to /srv/_runners/elasticreactor.py
+   Put this script to /srv/_runners/elasticreactor.py
 
-In order to connect to a elasticsearch Server, you must specify in the Salt master configuration the currently available server.
-elasticreactor:
-  es_host: 'SERVERNAME'
-  es_port: '9200'
-  es_index: 'salt-log-v1'
-  es_doc_type: 'default'
+   restart the salt-master
+
+   In order to connect to a elasticsearch Server, you must specify in the Salt master configuration the currently available server.
+   elasticreactor:
+     es_host: 'SERVERNAME'
+     es_port: '9200'
+     es_index: 'salt-log-v1'
+     es_doc_type: 'default'
 
 '''
 
