@@ -35,7 +35,6 @@ def list(name):
 
     salt '*' techgrp.list foo
     '''
-
     name2lst = str(name + ':x')
 
     NGlist = []
@@ -83,7 +82,6 @@ def add(name, gid):
     salt '*' techgrp.add name=foo gid=123
 
     '''
-
     if not chk(name):
         #group does not exist
         with open('/etc/group', 'r+') as newfile:
@@ -109,7 +107,6 @@ def delete(name):
 
     salt '*' techgrp.delete name=foo
     '''
-    
     name2del = str(name + ':x')
     counter = 0
     #with open('/etc/passwd') as oldfile, open('/etc/newpasswd', 'w') as newfile:
