@@ -20,7 +20,10 @@ def __virtual__():
         return False, 'This module doesn\'t work on Windows.'
 
     if os.path.isfile('/var/patrol/patrol_nostart'):
-        return False, 'This Server ha the patrol_nostart Flag'
+        return False, 'This Server has the patrol_nostart flag.'
+
+    if not os.path.isfile('/var/patrol/scripts/maintenance'):
+        return False, 'Can not find the Patrol maintenance script.'
     return True
 
 def chk_maint():
