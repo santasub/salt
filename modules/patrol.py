@@ -49,8 +49,6 @@ def chk_maint():
     else:
         return False
 
-
-
 def get_maint_info():
     '''
     Get information about the Maintenance in progress.
