@@ -11,12 +11,6 @@ Module to amange the bmc patrol operations management
 use it to "set" & "end" the Maintenance Mode and more.
 '''
 
-#/var/patrol/scripts/maintenance -t 26h -acv "/GK_COOP_BIZERBA_PROC/GK_COOP_BIZERBA_PROC/prgen -msg XCScale_Deamon_Maintenance_START
-#/var/patrol/scripts/maintenance -t END -acv "/GK_COOP_BIZERBA_PROC/GK_COOP_BIZERBA_PROC/prgen -msg XCScale_Deamon_Maintenance_END
-#/var/patrol/scripts/maintenance -t 26h -acv "/GK_COOP_BIZERBA_PROC/GK_COOP_BIZERBA_PROC/prgen -msg XCScale_Deamon_Maintenance_STRECH
-
-#/var/patrol/scripts/maintenance -t 26h -user werap -msg Testli
-
 def __virtual__():
     '''
     Only works on POSIX-like systems
@@ -68,13 +62,14 @@ def get_maint_info():
     status = chk_maint()
 
     if status:
-        MaintStatus='/var/patrol/scripts/maintenance -status'
+        cmd='/var/patrol/scripts/maintenance -status'
 
         try:
-            output = subprocess.check_output(MaintStatus, stderr=subprocess.STDOUT, shell=True, universal_newlines=True)
+            output = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True, universal_newlines=True)
         except subprocess.CalledProcessError as exc:
             RC = exc.returncode
             OP = exc.output
+
             return False, 'The command could not be executed'
 
         #remove empty lines from string
@@ -83,7 +78,7 @@ def get_maint_info():
     else:
         return 'No Maintenance set'
 
-def set_maint(duration, msg='', user='', specialID='', sleep=False):
+def set_maint(duration, msg='', user='', specialID='', sleep=False, debug=False):
     '''
     Set Maintenance on a Minion for a given time.
     Minimum parameter is duration the rest is Optional.
@@ -96,10 +91,9 @@ def set_maint(duration, msg='', user='', specialID='', sleep=False):
 
         .. code-block:: bash
 
-    salt '*' patrol.set_maint duration=1h specialID='/this/is/just/a/sample' user=patrol msg='Message_to_set' sleep=True
+    salt '*' patrol.set_maint duration=1h specialID='/this/is/just/a/sample' user=patrol msg='Message_to_set' sleep=True debug=True
 
     '''
-
     cmd1=''
     cmd2=''
     cmd3=''
@@ -107,17 +101,20 @@ def set_maint(duration, msg='', user='', specialID='', sleep=False):
 
     if duration:
         if specialID:
-                cmd1='-acv ' + specialID + ' '
-        if user:
-                cmd2='-user ' + user + ' '
-        if msg:
-                cmd3='-msg ' + msg + ' '
-        if sleep:
-                cmd4='--sleep'
+            cmd1='-acv ' + specialID + ' '
 
-        BSetMaint='/var/patrol/scripts/maintenance -t ' + duration + ' ' + cmd1 + cmd2 + cmd3 + cmd4
+        if user:
+            cmd2='-user ' + user + ' '
+
+        if msg:
+            cmd3='-msg ' + msg + ' '
+
+        if sleep:
+            cmd4='--sleep'
+
+        cmd='/var/patrol/scripts/maintenance -t ' + duration + ' ' + cmd1 + cmd2 + cmd3 + cmd4
         try:
-                output = subprocess.check_output(BSetMaint, stderr=subprocess.STDOUT, shell=True, universal_newlines=True)
+                output = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True, universal_newlines=True)
         except subprocess.CalledProcessError as exc:
                 RC = exc.returncode
                 OP = exc.output
@@ -126,24 +123,34 @@ def set_maint(duration, msg='', user='', specialID='', sleep=False):
         else:
                 return True
 
-def end_maint():
+def end_maint(specialID='', sleep=False):
     '''
     End Maintenance on a Minion.
+    The param specialID is Optional. Set sleep=True to wait for 60 Sec
 
         .. code-block:: bash
 
-    salt '*' patrol.end_maint
+    salt '*' patrol.end_maint specialID='/this/is/just/a/sample'
 
     '''
+    cmd1=''
+    cmd2=''
+    cmd3=''
 
-    BEndMaint='/var/patrol/scripts/maintenance -t END >/dev/null 2>&1'
+    if specialID:
+        cmd1='-acv ' + specialID + ' '
+
+    if sleep:
+        cmd2='--sleep'
+
+    cmd='/var/patrol/scripts/maintenance -t END ' + cmd1 + cmd2
 
     try:
-        output = subprocess.check_output(BEndMaint, stderr=subprocess.STDOUT, shell=True, universal_newlines=True)
+        output = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True, universal_newlines=True)
     except subprocess.CalledProcessError as exc:
         RC = exc.returncode
         OP = exc.output
 
-        return True
-    else:
         return False
+    else:
+        return True
