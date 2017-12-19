@@ -96,7 +96,7 @@ def set_maint(duration, msg='', user='', specialID='', sleep=False):
 
         .. code-block:: bash
 
-    salt '*' patrol.set_maint duration=1h specialID='/this/is/just/a/sample' user=patrol msg='Message' sleep=True
+    salt '*' patrol.set_maint duration=1h specialID='/this/is/just/a/sample' user=patrol msg='Message_to_set' sleep=True
 
     '''
 
