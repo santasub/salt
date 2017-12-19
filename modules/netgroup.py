@@ -28,7 +28,6 @@ def list():
 
     salt '*' netgroup.list
     '''
-
     NGlist = []
     for line in open('/etc/passwd','r').readlines():
         if "+@" in line:
@@ -67,7 +66,6 @@ def add(name):
 
     salt '*' netgroup.add name=L-ADMIN
     '''
-
     delete("+::::::/sbin/nologin")
 
     with open('/etc/passwd', 'r+') as newfile:
@@ -93,7 +91,7 @@ def delete(name):
     salt '*' netgroup.delete name=L-ADMIN
     '''
     counter = 0
-#    with open('/etc/passwd') as oldfile, open('/etc/newpasswd', 'w') as newfile:
+    #with open('/etc/passwd') as oldfile, open('/etc/newpasswd', 'w') as newfile:
     #FIX because python 2.6 dont like the above version 
     with open('/etc/passwd') as oldfile:
         with open('/etc/newpasswd', 'w') as newfile:
