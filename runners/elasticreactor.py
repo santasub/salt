@@ -136,6 +136,8 @@ def log_stuff(data_str):
 
       if dryrun:
          casetype = 'DRYRUN'
+         change_count = 0
+         error_count = 0
       else:
          casetype = 'ERROR'
 
@@ -146,6 +148,8 @@ def log_stuff(data_str):
 
       if dryrun:
          casetype = 'DRYRUN'
+         change_count = 0
+         error_count = 0
       else:
          casetype = 'CHANGE'
 
