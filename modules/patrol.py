@@ -80,8 +80,8 @@ def get_maint_info():
     '''
     nostart = ''
 
-    if chk_nostart:
-        nostart = ' This Server has the patrol_nostart flag.'
+    if chk_nostart():
+        nostart = ' ### This Server has the patrol_nostart flag.'
 
     status = chk_maint()
 
@@ -98,7 +98,7 @@ def get_maint_info():
 
         #remove empty lines from string
         output = os.linesep.join([s for s in output.splitlines() if s])
-        return output + ' ### ' + nostart
+        return output + nostart
     else:
         return 'No Maintenance set!' + nostart
 
