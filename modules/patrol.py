@@ -19,12 +19,32 @@ def __virtual__():
     if salt.utils.is_windows():
         return False, 'This module doesn\'t work on Windows.'
 
+    if __salt__['pkg.version']('COOPPatrolAgent'):
+        return False, 'Patrol is not Installed.'
+
+    '''
     if os.path.isfile('/var/patrol/patrol_nostart'):
         return False, 'This Server has the patrol_nostart flag.'
 
     if not os.path.isfile('/var/patrol/scripts/maintenance'):
         return False, 'Can not find the Patrol maintenance script.'
     return True
+    '''
+
+def chk_nostart():
+    '''
+    Returns True if the patrol_nostart flag exists and False if not.
+    ('/var/patrol/patrol_nostart').
+
+       .. code-block:: bash
+
+    salt '*' patrol.chk_nostart
+    '''
+
+    if os.path.isfile('/var/patrol/patrol_nostart'):
+        return True
+    else:
+        return False
 
 def chk_maint():
     '''
@@ -37,10 +57,11 @@ def chk_maint():
     salt '*' patrol.chk_maint
 
     '''
-    BCheckMaint='/var/patrol/scripts/maintenance --sstatus >/dev/null 2>&1'
+
+    cmd='/var/patrol/scripts/maintenance --sstatus >/dev/null 2>&1'
 
     try:
-        output = subprocess.check_output(BCheckMaint, stderr=subprocess.STDOUT, shell=True, universal_newlines=True)
+        output = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True, universal_newlines=True)
     except subprocess.CalledProcessError as exc:
         RC = exc.returncode
         OP = exc.output
@@ -60,6 +81,11 @@ def get_maint_info():
     salt '*' patrol.get_maint_info
 
     '''
+    nostart = ''
+
+    if chk_nostart:
+        nostart = ' This Server has the patrol_nostart flag.'
+
     status = chk_maint()
 
     if status:
@@ -75,9 +101,9 @@ def get_maint_info():
 
         #remove empty lines from string
         output = os.linesep.join([s for s in output.splitlines() if s])
-        return output
+        return output + nostart
     else:
-        return 'No Maintenance set'
+        return 'No Maintenance set' + nostart
 
 def set_maint(duration, msg='', user='', specialID='', sleep=False, debug=False):
     '''
@@ -136,8 +162,10 @@ def end_maint(specialID='', sleep=False):
     '''
     cmd1=''
     cmd2=''
-    cmd3=''
-
+            
+    if not chk_maint():
+        return False, 'The System is not in Maintenance'
+            
     if specialID:
         cmd1='-acv ' + specialID + ' '
 
