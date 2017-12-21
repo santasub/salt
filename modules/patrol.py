@@ -19,17 +19,16 @@ def __virtual__():
     if salt.utils.is_windows():
         return False, 'This module doesn\'t work on Windows.'
 
-    if __salt__['pkg.version']('COOPPatrolAgent'):
+    if not __salt__['pkg.version']('COOPPatrolAgent'):
         return False, 'Patrol is not Installed.'
 
     '''
     if os.path.isfile('/var/patrol/patrol_nostart'):
         return False, 'This Server has the patrol_nostart flag.'
-
     if not os.path.isfile('/var/patrol/scripts/maintenance'):
         return False, 'Can not find the Patrol maintenance script.'
-    return True
     '''
+    return True
 
 def chk_nostart():
     '''
@@ -55,7 +54,6 @@ def chk_maint():
         .. code-block:: bash
 
     salt '*' patrol.chk_maint
-
     '''
 
     cmd='/var/patrol/scripts/maintenance --sstatus >/dev/null 2>&1'
@@ -79,7 +77,6 @@ def get_maint_info():
         .. code-block:: bash
 
     salt '*' patrol.get_maint_info
-
     '''
     nostart = ''
 
@@ -101,15 +98,14 @@ def get_maint_info():
 
         #remove empty lines from string
         output = os.linesep.join([s for s in output.splitlines() if s])
-        return output + nostart
+        return output + ' ### ' + nostart
     else:
-        return 'No Maintenance set' + nostart
+        return 'No Maintenance set!' + nostart
 
 def set_maint(duration, msg='', user='', specialID='', sleep=False, debug=False):
     '''
     Set Maintenance on a Minion for a given time.
     Minimum parameter is duration the rest is Optional.
-
     duration: 1h/1min
     specialID: pre defined id to set a special Maintenance
     user: user to set maintenance with
@@ -119,7 +115,6 @@ def set_maint(duration, msg='', user='', specialID='', sleep=False, debug=False)
         .. code-block:: bash
 
     salt '*' patrol.set_maint duration=1h specialID='/this/is/just/a/sample' user=patrol msg='Message_to_set' sleep=True debug=True
-
     '''
     cmd1=''
     cmd2=''
@@ -158,14 +153,13 @@ def end_maint(specialID='', sleep=False):
         .. code-block:: bash
 
     salt '*' patrol.end_maint specialID='/this/is/just/a/sample'
-
     '''
     cmd1=''
     cmd2=''
-            
+
     if not chk_maint():
         return False, 'The System is not in Maintenance'
-            
+
     if specialID:
         cmd1='-acv ' + specialID + ' '
 
