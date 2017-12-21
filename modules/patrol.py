@@ -102,7 +102,7 @@ def get_maint_info():
     else:
         return 'No Maintenance set!' + nostart
 
-def set_maint(duration, msg='', user='', specialID='', sleep=False, debug=False):
+def set_maint(duration, msg='', user='', specialID='', sleep=False):
     '''
     Set Maintenance on a Minion for a given time.
     Minimum parameter is duration the rest is Optional.
