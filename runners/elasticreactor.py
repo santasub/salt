@@ -34,9 +34,10 @@ on the salt-master server.
 
    In order to connect to a elasticsearch Server, you must specify in the Salt master configuration the currently available server.
    elasticreactor:
-     es_host: 'SERVERNAME'
+     es_host: 'SERVERNAME1'
      es_port: '9200'
      es_index: 'salt-log-v1'
+     es_index_date: True
      es_doc_type: 'default'
 
 '''
@@ -81,6 +82,7 @@ def __virtual__():
       es_host = elasticreactor_config.get('es_host', None)
       es_port = elasticreactor_config.get('es_port', '9200')
       es_index = elasticreactor_config.get('es_index', 'salt-log-v1')
+      es_index_date = elasticreactor_config.get('es_index', False)
       es_doc_type = elasticreactor_config.get('es_doc_type', 'default')
 
       if not es_host:
@@ -99,6 +101,7 @@ def _get_elasticreator_configuration():
       'es_host': __opts__['elasticreactor']['es_host'],
       'es_port': __opts__['elasticreactor']['es_port'],
       'es_index': __opts__['elasticreactor']['es_index'],
+      'es_index_date': __opts__['elasticreactor']['es_index_date'],
       'es_doc_type': __opts__['elasticreactor']['es_doc_type']
    }
 
@@ -183,7 +186,13 @@ def WriteToEs(data, casetype, change_count, error_count, payload):
    es_host = config['es_host']
    es_port = config['es_port']
    es_index = config['es_index']
+   es_index_date = config['es_index']
    es_doc_type= config['es_doc_type']
+
+   if es_index_date:
+      es_index = '{0}-{1}'.format(index, datetime.date.today().strftime('%Y.%m.%d')) 
+
+   _ensure_index(es_index)
 
    es = Elasticsearch([{'host': es_host,'port': es_port}])
    es.index(index=es_index, doc_type=es_doc_type, body=json.dumps(es_data))
