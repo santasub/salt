@@ -50,6 +50,8 @@ import datetime
 import json
 import os
 import logging
+import socket
+import sys
 
 log = logging.getLogger(__name__)
 
@@ -199,3 +201,26 @@ def WriteToEs(data, casetype, change_count, error_count, payload):
 
    #log.debug('es_host: ' + es_host + ' es_port: ' + es_port + ' es_index: ' + es_index + ' es_doc_type: ' + es_doc_type)
    return True
+
+def WriteToLogstash(data, casetype, change_count, error_count, payload):
+   #https://gist.github.com/jgoodall/6323951
+   ###NOT TESTED
+   HOST = ''
+   PORT = '9563'
+
+   try:
+      sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+   except socket.error, msg:
+      sys.stderr.write("[ERROR] %s\n" % msg[1])
+      sys.exit(1)
+
+   try:
+      sock.connect((HOST, PORT))
+   except socket.error, msg:
+      sys.stderr.write("[ERROR] %s\n" % msg[1])
+      sys.exit(2)
+
+   msg = {'@message': 'python test message', '@tags': ['python', 'test']}
+
+   sock.send(json.dumps(msg))
+   sock.close()
