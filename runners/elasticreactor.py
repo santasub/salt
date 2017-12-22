@@ -54,6 +54,7 @@ log = logging.getLogger(__name__)
 
 try:
    from elasticsearch import Elasticsearch
+   from elasticsearch.exceptions import TransportError
    HAS_ELASTIC = True
 except ImportError:
    HAS_ELASTIC = False
@@ -183,10 +184,23 @@ def WriteToEs(data, casetype, change_count, error_count, payload):
    es_host = config['es_host']
    es_port = config['es_port']
    es_index = config['es_index']
+   es_index_date = config['es_index']
    es_doc_type= config['es_doc_type']
 
+   if es_index_date:
+      es_index = '{0}-{1}'.format(es_index, datetime.date.today().strftime('%Y.%m.%d')) 
+
    es = Elasticsearch([{'host': es_host,'port': es_port}])
-   es.index(index=es_index, doc_type=es_doc_type, body=json.dumps(es_data))
+
+   try:
+      es.index(index=es_index, doc_type=es_doc_type, body=json.dumps(es_data))
+
+   except TransportError as e:
+      # ignore already existing index
+      if e.error == 'index_already_exists_exception':
+         pass
+      else:
+         raise
 
    #log.debug('es_host: ' + es_host + ' es_port: ' + es_port + ' es_index: ' + es_index + ' es_doc_type: ' + es_doc_type)
    return True
