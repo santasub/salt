@@ -1,15 +1,24 @@
 # -*- coding: utf-8 -*-
+'''
+Module to manage the bmc patrol operations management
+use it to "set" & "end" the Maintenance Mode and more.
+'''
+from __future__ import absolute_import
 import salt
 import commands
 import os
 import subprocess
+import logging
 import salt.utils
 # Change salt.utils in future release of salt to the following
 #import salt.utils.platform
-'''
-Module to amange the bmc patrol operations management
-use it to "set" & "end" the Maintenance Mode and more.
-'''
+
+log = logging.getLogger(__name__)
+
+HASPATROL = False
+
+if __salt__['pkg.version']('COOPPatrolAgent'):
+    HASPATROL = True
 
 def __virtual__():
     '''
@@ -19,8 +28,9 @@ def __virtual__():
     if salt.utils.is_windows():
         return False, 'This module doesn\'t work on Windows.'
 
-    if not __salt__['pkg.version']('COOPPatrolAgent'):
-        return False, 'Patrol is not Installed.'
+    if HASPATROL:
+        return __virtualname__
+    return (False, 'Patrol is not Installed.')
 
     '''
     if os.path.isfile('/var/patrol/patrol_nostart'):
