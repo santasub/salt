@@ -15,10 +15,7 @@ import salt.utils
 
 log = logging.getLogger(__name__)
 
-HASPATROL = False
-
-if __salt__['pkg.version']('COOPPatrolAgent'):
-    HASPATROL = True
+__virtualname__ = 'patrol'
 
 def __virtual__():
     '''
@@ -28,17 +25,10 @@ def __virtual__():
     if salt.utils.is_windows():
         return False, 'This module doesn\'t work on Windows.'
 
-    if HASPATROL:
-        return __virtualname__
-    return False, 'Patrol is not Installed.'
-
-    '''
-    if os.path.isfile('/var/patrol/patrol_nostart'):
-        return False, 'This Server has the patrol_nostart flag.'
     if not os.path.isfile('/var/patrol/scripts/maintenance'):
-        return False, 'Can not find the Patrol maintenance script.'
-    '''
-    return True
+        return False, 'Patrol is not Installed.'
+
+    return __virtualname__
 
 def chk_nostart():
     '''
@@ -65,7 +55,6 @@ def chk_maint():
 
     salt '*' patrol.chk_maint
     '''
-
     cmd='/var/patrol/scripts/maintenance --sstatus >/dev/null 2>&1'
 
     try:
