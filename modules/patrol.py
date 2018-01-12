@@ -30,7 +30,7 @@ def __virtual__():
 
     if HASPATROL:
         return __virtualname__
-    return (False, 'Patrol is not Installed.')
+    return False, 'Patrol is not Installed.'
 
     '''
     if os.path.isfile('/var/patrol/patrol_nostart'):
