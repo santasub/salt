@@ -46,28 +46,27 @@ def chk_nostart():
 def enable():
     '''
     Removes the patrol_nostart flag and starts the Patrol Service and
-    enables it from starting on boot.
+    enables it from starting on boottime.
     Returns True if succesfull and False if not.
-    ('/var/patrol/patrol_nostart').
 
        .. code-block:: bash
 
     salt '*' patrol.chk_nostart
     '''
-    result_Flag = False
-    result_service_enabled = False
-    result_service_start = False
+    result_set_Flag = True
+    result_service_enabled = True
+    result_service_started = True
 
     if __salt__['file.file_exists']('/var/patrol/patrol_nostart'):
-        result_Flag = __salt__['file.remove']('/var/patrol/patrol_nostart')
+        result_set_Flag = __salt__['file.remove']('/var/patrol/patrol_nostart')
 
     if not __salt__['service.enabled']('PatrolAgent'):
         result_service_enabled = __salt__['service.enable']('PatrolAgent')
 
     if not __salt__['service.status']('PatrolAgent'):
-        result_service_start = result = __salt__['service.start']('PatrolAgent')
+        result_service_started = result = __salt__['service.start']('PatrolAgent')
 
-    if result_Flag and result_service_enabled and result_service_start:
+    if result_set_Flag and result_service_enabled and result_service_started:
         return bool(True)
     else:
         return bool(False)
@@ -75,29 +74,30 @@ def enable():
 def disable():
     '''
     Creates the patrol_nostart flag and stops the Patrol Service and
-    disables it from starting on boot.
+    disables it from starting on boottime.
     Returns True if succesfull and False if not.
-    ('/var/patrol/patrol_nostart').
 
        .. code-block:: bash
 
     salt '*' patrol.chk_nostartsal
     '''
-        result_Flag = False
-    result_service_enabled = False
-    result_service_start = False
+    result_rm_Flag = True
+    result_service_disabled = True
+    result_service_stoped = True
+
     if not __salt__['file.file_exists']('/var/patrol/patrol_nostart'):
-        __salt__['file.write']('/var/patrol/patrol_nostart')
+       result_rm_Flag = __salt__['file.write']('/var/patrol/patrol_nostart')
 
     if __salt__['service.enabled']('PatrolAgent'):
-        __salt__['service.disable']('PatrolAgent')
+        result_service_disabled = __salt__['service.disable']('PatrolAgent')
 
     if __salt__['service.status']('PatrolAgent'):
-        result = __salt__['service.stop']('PatrolAgent')
-    else:
-        result = True
+        result_service_stoped = __salt__['service.stop']('PatrolAgent')
 
-    return bool(result)
+    if result_rm_Flag and result_service_disabled and result_service_stoped:
+        return bool(True)
+    else:
+        return bool(False)
 
 def chk_maint():
     '''
