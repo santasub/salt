@@ -43,6 +43,62 @@ def chk_nostart():
 
     return bool(result)
 
+def enable():
+    '''
+    Removes the patrol_nostart flag and starts the Patrol Service and
+    enables it from starting on boot.
+    Returns True if succesfull and False if not.
+    ('/var/patrol/patrol_nostart').
+
+       .. code-block:: bash
+
+    salt '*' patrol.chk_nostart
+    '''
+    result_Flag = False
+    result_service_enabled = False
+    result_service_start = False
+
+    if __salt__['file.file_exists']('/var/patrol/patrol_nostart'):
+        result_Flag = __salt__['file.remove']('/var/patrol/patrol_nostart')
+
+    if not __salt__['service.enabled']('PatrolAgent'):
+        result_service_enabled = __salt__['service.enable']('PatrolAgent')
+
+    if not __salt__['service.status']('PatrolAgent'):
+        result_service_start = result = __salt__['service.start']('PatrolAgent')
+
+    if result_Flag and result_service_enabled and result_service_start:
+        return bool(True)
+    else:
+        return bool(False)
+
+def disable():
+    '''
+    Creates the patrol_nostart flag and stops the Patrol Service and
+    disables it from starting on boot.
+    Returns True if succesfull and False if not.
+    ('/var/patrol/patrol_nostart').
+
+       .. code-block:: bash
+
+    salt '*' patrol.chk_nostartsal
+    '''
+        result_Flag = False
+    result_service_enabled = False
+    result_service_start = False
+    if not __salt__['file.file_exists']('/var/patrol/patrol_nostart'):
+        __salt__['file.write']('/var/patrol/patrol_nostart')
+
+    if __salt__['service.enabled']('PatrolAgent'):
+        __salt__['service.disable']('PatrolAgent')
+
+    if __salt__['service.status']('PatrolAgent'):
+        result = __salt__['service.stop']('PatrolAgent')
+    else:
+        result = True
+
+    return bool(result)
+
 def chk_maint():
     '''
     Check if the minion is in Maintenance Mode.
