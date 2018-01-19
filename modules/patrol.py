@@ -81,6 +81,9 @@ def disable():
 
     salt '*' patrol.chk_nostartsal
     '''
+    if chk_maint():
+        return False, 'The System is in Maintenance! You cannot disable Patrol when it is in Maintenance'
+
     result_rm_Flag = True
     result_service_disabled = True
     result_service_stoped = True
@@ -175,7 +178,7 @@ def set_maint(duration, msg='', user='', specialID='', sleep=False):
 
         cmd='/var/patrol/scripts/maintenance -t ' + duration + ' ' + cmd1 + cmd2 + cmd3 + cmd4
 
-        result = __salt__['cmd.retcode'](cmd, output_loglevel='quiet', python_shell=False)
+        result = __salt__['cmd.run'](cmd, output_loglevel='quiet', python_shell=False)
 
         return bool(result)
 
@@ -202,6 +205,6 @@ def end_maint(specialID='', sleep=False):
 
     cmd='/var/patrol/scripts/maintenance -t END ' + cmd1 + cmd2
 
-    result = __salt__['cmd.retcode'](cmd, output_loglevel='quiet', python_shell=False)
-
+    result = __salt__['cmd.run'](cmd, output_loglevel='quiet', python_shell=False)
+    
     return bool(result)
