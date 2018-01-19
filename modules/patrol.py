@@ -111,7 +111,7 @@ def chk_maint():
     '''
     cmd='/var/patrol/scripts/maintenance --sstatus >/dev/null 2>&1'
 
-    result = __salt__['cmd.run'](cmd, output_loglevel='quiet', python_shell=False)
+    result = __salt__['cmd.retcode'](cmd, output_loglevel='quiet', python_shell=False)
 
     return bool(result)
 
@@ -130,9 +130,7 @@ def get_maint_info():
     if chk_nostart():
         nostart = ' ### This Server has the patrol_nostart flag.'
 
-    status = chk_maint()
-
-    if status:
+    if chk_maint():
         cmd='/var/patrol/scripts/maintenance -status'
 
         result = __salt__['cmd.run'](cmd, output_loglevel='quiet', python_shell=False)
@@ -177,7 +175,7 @@ def set_maint(duration, msg='', user='', specialID='', sleep=False):
 
         cmd='/var/patrol/scripts/maintenance -t ' + duration + ' ' + cmd1 + cmd2 + cmd3 + cmd4
 
-        result = __salt__['cmd.run'](cmd, output_loglevel='quiet', python_shell=False)
+        result = __salt__['cmd.retcode'](cmd, output_loglevel='quiet', python_shell=False)
 
         return bool(result)
 
@@ -204,6 +202,6 @@ def end_maint(specialID='', sleep=False):
 
     cmd='/var/patrol/scripts/maintenance -t END ' + cmd1 + cmd2
 
-    result = __salt__['cmd.run'](cmd, output_loglevel='quiet', python_shell=False)
+    result = __salt__['cmd.retcode'](cmd, output_loglevel='quiet', python_shell=False)
 
     return bool(result)
