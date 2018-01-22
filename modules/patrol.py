@@ -102,7 +102,7 @@ def disable():
     else:
         return bool(False)
 
-def chk_maint():
+def chk_maint(not_needed_var=''):
     '''
     Check if the minion is in Maintenance Mode.
     Returns True if the System is in Maintenance
@@ -114,7 +114,7 @@ def chk_maint():
     '''
     cmd='/var/patrol/scripts/maintenance --sstatus >/dev/null 2>&1'
 
-    result = __salt__['cmd.retcode'](cmd, output_loglevel='quiet', python_shell=False)
+    result = __salt__['cmd.run'](cmd, output_loglevel='quiet', python_shell=False)
 
     return bool(result)
 
