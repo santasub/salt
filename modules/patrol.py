@@ -45,9 +45,8 @@ def chk_nostart():
 
 def enable():
     '''
-    Removes the patrol_nostart flag and starts the Patrol Service and
-    enables it from starting on boottime.
-    Returns True if succesfull and False if not.
+    Enables Patrol on this Server by removing the patrol_nostart Flag.
+    It also starts and enables the PatrolAgent service.
 
        .. code-block:: bash
 
@@ -73,9 +72,8 @@ def enable():
 
 def disable():
     '''
-    Creates the patrol_nostart flag and stops the Patrol Service and
-    disables it from starting on boottime.
-    Returns True if succesfull and False if not.
+    Disables Patrol on this Server by creating the patrol_nostart Flag.
+    It also stops and disables the PatrolAgent service.
 
        .. code-block:: bash
 
