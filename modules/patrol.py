@@ -110,6 +110,9 @@ def chk_maint(not_needed_var=''):
 
     salt '*' patrol.chk_maint
     '''
+    if chk_nostart():
+        return False
+
     cmd='/var/patrol/scripts/maintenance --sstatus >/dev/null 2>&1'
 
     result = __salt__['cmd.run'](cmd, output_loglevel='quiet', python_shell=False)
