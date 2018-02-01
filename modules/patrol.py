@@ -145,7 +145,7 @@ def get_maint_info():
     else:
         return 'No Maintenance set!' + nostart
 
-def set_maint(duration, msg='', user='', specialID='', sleep=False):
+def set_maint(duration, msg='', user='', specialID='', sleep=False, debug=False):
     '''
     Set Maintenance on a Minion for a given time.
     Minimum parameter is duration the rest is Optional.
@@ -164,6 +164,9 @@ def set_maint(duration, msg='', user='', specialID='', sleep=False):
     cmd3=''
     cmd4=''
 
+    if chk_nostart():
+        return False
+
     if duration:
         if specialID:
             cmd1='-acv ' + specialID + ' '
@@ -175,9 +178,12 @@ def set_maint(duration, msg='', user='', specialID='', sleep=False):
             cmd3='-msg ' + msg + ' '
 
         if sleep:
-            cmd4='--sleep'
+            cmd4='--sleep '
 
-        cmd='/var/patrol/scripts/maintenance -t ' + duration + ' ' + cmd1 + cmd2 + cmd3 + cmd4
+        if debug:
+            cmd5='--debug'
+
+        cmd='/var/patrol/scripts/maintenance -t ' + duration + ' ' + cmd1 + cmd2 + cmd3 + cmd4 + cmd5
 
         result = __salt__['cmd.run'](cmd, output_loglevel='quiet', python_shell=False)
 
