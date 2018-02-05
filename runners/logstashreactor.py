@@ -31,9 +31,7 @@ If found return data to an logstash server for indexing.
    In order to connect to a logstash Server, you must specify in the Salt master configuration the currently available server.
    logstashreactor:
      ls_host: 'SERVERNAME'
-     ls_port: '9200'
-     ls_index: 'salt-log-v1'
-     ls_doc_type: 'default'
+     ls_port: '5000'
 
 '''
 
@@ -68,9 +66,7 @@ def __virtual__():
 
    if logstash_config:
       ls_host = logstashreactor_config.get('ls_host', None)
-      ls_port = logstashreactor_config.get('ls_port', '9200')
-      ls_index = logstashreactor_config.get('ls_index', 'salt-log-v1')
-      ls_doc_type = logstashreactor_config.get('ls_doc_type', 'default')
+      ls_port = logstashreactor_config.get('ls_port', '5000')
 
       if not ls_host:
          return False, ("Logstash host not defined in config. Please see documentation")
@@ -86,8 +82,6 @@ def _get_logstashreator_configuration():
    return {
       'ls_host': __opts__['logstashreactor']['ls_host'],
       'ls_port': __opts__['logstashreactor']['ls_port'],
-      'ls_index': __opts__['logstashreactor']['ls_index'],
-      'ls_doc_type': __opts__['logstashreactor']['ls_doc_type']
    }
 
 def log_stuff(data_str):
@@ -158,9 +152,6 @@ def WriteToLS(data, casetype, change_count, error_count, payload):
 
    ls_host = config['ls_host']
    ls_port = config['ls_port']
-   ls_index = config['ls_index']
-   ls_index_date = config['ls_index']
-   ls_doc_type= config['ls_doc_type']
 
    try:
       sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
