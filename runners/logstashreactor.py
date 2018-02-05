@@ -61,10 +61,9 @@ def __virtual__():
    '''
    Check to see if master config has the necessary config
    '''
+   logstashreactor_config = __opts__['logstashreactor'] if 'logstashreactor' in __opts__ else None
 
-   logstash_config = __opts__['logstashreactor'] if 'logstashreactor' in __opts__ else None
-
-   if logstash_config:
+   if logstashreactor_config:
       ls_host = logstashreactor_config.get('ls_host', None)
       ls_port = logstashreactor_config.get('ls_port', '5000')
 
