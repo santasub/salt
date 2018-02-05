@@ -219,9 +219,6 @@ def WriteToLS(data, casetype, change_count, error_count, payload):
 
    ls_host = config['es_host']
    ls_port = config['es_port']
-   ls_index = config['es_index']
-   ls_index_date = config['es_index']
-   ls_doc_type= config['es_doc_type']
 
    try:
       sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
