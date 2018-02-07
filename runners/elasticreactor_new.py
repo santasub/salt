@@ -46,10 +46,14 @@ from datetime import tzinfo, timedelta
 
 import subprocess
 import datetime
-import json
 import os
 import logging
 import socket
+
+try:
+  import json
+except ImportError:
+  import simplejson as json
 
 log = logging.getLogger(__name__)
 
@@ -144,6 +148,7 @@ def log_stuff(data_str):
          casetype = 'ERROR'
 
       WriteToEs(data, casetype, change_count, error_count, payload)
+      WriteToLs(data, casetype, change_count, error_count, payload)
 
    if changes:
       payload = subprocess.check_output(["salt-run", "jobs.lookup_jid", data['jid']])
@@ -156,6 +161,7 @@ def log_stuff(data_str):
          casetype = 'CHANGE'
 
       WriteToEs(data, casetype, change_count, error_count, payload)
+      WriteToLs(data, casetype, change_count, error_count, payload)
 
    return True
 
@@ -170,17 +176,17 @@ def WriteToEs(data, casetype, change_count, error_count, payload):
    job_fun = data['fun']
    job_id = data['jid']
 
-   es_data = {
-         '@timestamp': datetime.datetime.now(utc).isoformat(),
-         'case': casetype,
-         'change_count': change_count,
-         'error_count': error_count,
-         'minion': minion_name,
-         'master': master,
-         'fun': job_fun,
-         'jid': job_id,
-         'data': payload
-   }
+   es_data = {}
+
+   es_data['@timestamp'] = datetime.datetime.now(utc).isoformat()
+   es_data['case'] = casetype
+   es_data['change_count'] = change_count
+   es_data['error_count'] = error_count
+   es_data['minion'] = minion_name
+   es_data['master'] = master
+   es_data['fun'] = job_fun
+   es_data['jid'] = job_id
+   es_data['data'] = payload
 
    es_host = config['es_host']
    es_port = config['es_port']
@@ -206,7 +212,7 @@ def WriteToEs(data, casetype, change_count, error_count, payload):
    #log.debug('es_host: ' + es_host + ' es_port: ' + es_port + ' es_index: ' + es_index + ' es_doc_type: ' + es_doc_type)
    return True
 
-def WriteToLS(data, casetype, change_count, error_count, payload):
+def WriteToLs(data, casetype, change_count, error_count, payload):
    '''
    Write the gathered data to an elasticsearch server
    '''
@@ -220,29 +226,33 @@ def WriteToLS(data, casetype, change_count, error_count, payload):
    ls_host = config['es_host']
    ls_port = config['es_port']
 
+   '''Override for testing'''
+   ls_host = 'svrl1saltdev03.hs.coop.ch'
+   ls_port = 5000
+
+   ls_data = {}
+   
+   ls_data['@timestamp'] = datetime.datetime.now(utc).isoformat()
+   ls_data['case'] = casetype
+   ls_data['change_count'] = change_count
+   ls_data['error_count'] = error_count
+   ls_data['minion'] = minion_name
+   ls_data['master'] = master
+   ls_data['fun'] = job_fun
+   ls_data['jid'] = job_id
+   ls_data['data'] = payload
+
    try:
-      sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      tcpcon = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
    except socket.error as e:
       raise
 
    try:
-      sock.connect((ls_host, ls_port))
+      tcpcon.connect((ls_host, ls_port))
    except socket.error as e:
       raise
 
-   ls_data = {
-         '@timestamp': datetime.datetime.now(utc).isoformat(),
-         'case': casetype,
-         'change_count': change_count,
-         'error_count': error_count,
-         'minion': minion_name,
-         'master': master,
-         'fun': job_fun,
-         'jid': job_id,
-         'data': payload
-   }
-
-   sock.send(json.dumps(ls_data))
-   sock.close()
+   tcpcon.send((json.dumps(ls_data) + '\n'))
+   tcpcon.close()
 
    return True
