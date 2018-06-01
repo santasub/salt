@@ -20,12 +20,12 @@ class UTC(tzinfo):
 
 ls_data = {
     '@timestamp': datetime.datetime.now(utc).isoformat(),
-    "fqdn": "linadlinad.linad.ch",
+    "fqdn": "testhostname.com",
     "message": 'hello world',
     "type": "aix_syslogs",
   }
 
-ls_host = 'svrl1esmlsp01.hs.coop.ch'
+ls_host = 'SERVERNAME.COM'
 ls_port = 10666
 
 utc = UTC()
