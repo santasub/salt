@@ -698,6 +698,23 @@ def _get_netgroups():
 
   return result
 
+def _get_loggedones():
+    '''
+    '''
+  cmd = 'last'
+  result = __salt__['cmd.run'](cmd, output_loglevel='quiet', python_shell=False)
+
+  return result
+
+def _get_uptime():
+    '''
+    '''
+  cmd = 'uptime'
+  result = __salt__['cmd.run'](cmd, output_loglevel='quiet', python_shell=False)
+
+  return result
+
+
 def get_infos():
   ls_data = {}
 
@@ -794,6 +811,8 @@ def get_infos():
   ls_data['virtual'] = str(_get_virtual())
   ls_data['zmqversion'] = str(_get_zmqversion())
   ls_data['netgroups'] = str(_get_netgroups())
+  ls_data['netgroups'] = str(_get_loggedones())
+  ls_data['netgroups'] = str(_get_uptime())
 
   ls_host = 'svrl1btrfstst01.hs.coop.ch'
   ls_port = '9200'
@@ -804,7 +823,7 @@ def get_infos():
   if ls_index_date:
     ls_index = '{0}-{1}'.format(ls_index, datetime.date.today().strftime('%Y.%m.%d'))
 
-  ls = Elasticsearch([{'host': ls_host,'port': ls_port}])
+  ls = Elasticsearch([{'host': str(ls_host),'port': int(ls_port)}])
 
   try:
     ls.index(index=ls_index, doc_type=ls_doc_type, body=json.dumps(ls_data))
