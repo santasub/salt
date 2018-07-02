@@ -228,7 +228,7 @@ def WriteToEs(data, casetype, change_count, error_count, payload):
   if es_index_date:
     es_index = '{0}-{1}'.format(es_index, datetime.date.today().strftime('%Y.%m.%d')) 
 
-  es = Elasticsearch([{'host': es_host,'port': es_port}])
+  es = Elasticsearch([{'host': str(es_host),'port': int(es_port)}])
 
   try:
     es.index(index=es_index, doc_type=es_doc_type, body=json.dumps(es_data))
