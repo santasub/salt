@@ -811,8 +811,8 @@ def get_infos():
   ls_data['virtual'] = str(_get_virtual())
   ls_data['zmqversion'] = str(_get_zmqversion())
   ls_data['netgroups'] = str(_get_netgroups())
-  ls_data['netgroups'] = str(_get_loggedones())
-  ls_data['netgroups'] = str(_get_uptime())
+  ls_data['loggedones'] = str(_get_loggedones())
+  ls_data['uptime'] = str(_get_uptime())
 
   ls_host = 'svrl1btrfstst01.hs.coop.ch'
   ls_port = '9200'
