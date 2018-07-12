@@ -176,49 +176,49 @@ def _get_disks():
 def _get_dns_domain():
     '''
     '''
-    result = __grains__.get('dns:domain')
+    result = __salt__['grains.get']('dns:domain')
 
     return result
 
 def _get_dns_ip4_nameservers():
     '''
     '''
-    result = __grains__.get('dns:ip4_nameservers')
+    result = __salt__['grains.get']('dns:ip4_nameservers')
 
     return result
 
 def _get_dns_ip6_nameservers():
     '''
     '''
-    result = __grains__.get('dns:ip6_nameservers')
+    result = __salt__['grains.get']('dns:ip6_nameservers')
 
     return result
 
 def _get_dns_nameservers():
     '''
     '''
-    result = __grains__.get('dns:nameservers')
+    result = __salt__['grains.get']('dns:nameservers')
 
     return result
 
 def _get_dns_options():
     '''
     '''
-    result = __grains__.get('dns:options')
+    result = __salt__['grains.get']('dns:options')
 
     return result
 
 def _get_dns_search():
     '''
     '''
-    result = __grains__.get('dns:search')
+    result = __salt__['grains.get']('dns:search')
 
     return result
 
 def _get_dns_sortlist():
     '''
     '''
-    result = __grains__.get('dns:sortlist')
+    result = __salt__['grains.get']('dns:sortlist')
 
     return result
 
@@ -267,14 +267,14 @@ def _get_gid():
 def _get_gpus_model():
     '''
     '''
-    result = __grains__.get('gpus:model')
+    result = __salt__['grains.get']('gpus:model')
 
     return result
 
 def _get_gpus_vendor():
     '''
     '''
-    result = __grains__.get('gpus:vendor')
+    result = __salt__['grains.get']('gpus:vendor')
 
     return result
 
@@ -295,14 +295,14 @@ def _get_host():
 def _get_hwaddr_interfaces_eth0():
     '''
     '''
-    result = __grains__.get('hwaddr_interfaces:eth0')
+    result = __salt__['grains.get']('hwaddr_interfaces:eth0')
 
     return result
 
 def _get_hwaddr_interfaces_lo():
     '''
     '''
-    result = __grains__.get('hwaddr_interfaces:lo')
+    result = __salt__['grains.get']('hwaddr_interfaces:lo')
 
     return result
 
@@ -323,28 +323,28 @@ def _get_init():
 def _get_ip4_interfaces_eth0():
     '''
     '''
-    result = __grains__.get('ip4_interfaces:eth0')
+    result = __salt__['grains.get']('ip4_interfaces:eth0')
 
     return result
 
 def _get_ip4_interfaces_lo():
     '''
     '''
-    result = __grains__.get('ip4_interfaces:lo')
+    result = __salt__['grains.get']('ip4_interfaces:lo')
 
     return result
 
 def _get_ip6_interfaces_eth0():
     '''
     '''
-    result = __grains__.get('_get_ip6_interfaces:eth0')
+    result = __salt__['grains.get']('ip6_interfaces:eth0')
 
     return result
 
 def _get_ip6_interfaces_lo():
     '''
     '''
-    result = __grains__.get('_get_ip6_interfaces:lo')
+    result = __salt__['grains.get']('ip6_interfaces:lo')
 
     return result
 
@@ -379,21 +379,21 @@ def _get_kernelrelease():
 def _get_locale_info_defaultencoding():
     '''
     '''
-    result = __grains__.get('locale_info:defaultencoding')
+    result = __salt__['grains.get']('locale_info:defaultencoding')
 
     return result
 
 def _get_locale_info_defaultlanguage():
     '''
     '''
-    result = __grains__.get('locale_info:defaultlanguage')
+    result = __salt__['grains.get']('locale_info:defaultlanguage')
 
     return result
 
 def _get_locale_info_detectedencoding():
     '''
     '''
-    result = __grains__.get('locale_info:detectedencoding')
+    result = __salt__['grains.get']('locale_info:detectedencoding')
 
     return result
 
@@ -631,21 +631,21 @@ def _get_shell():
 def _get_susemanager_activation_key():
     '''
     '''
-    result = __grains__.get('susemanager:activation_key')
+    result = __salt__['grains.get']('susemanager:activation_key')
 
     return result
 
 def _get_systemd_features():
     '''
     '''
-    result = __grains__.get('systemd:features')
+    result = __salt__['grains.get']('systemd:features')
 
     return result
 
 def _get_systemd_version():
     '''
     '''
-    result = __grains__.get('systemd:version')
+    result = __salt__['grains.get']('systemd:version')
 
     return result
 
@@ -694,26 +694,56 @@ def _get_zmqversion():
 def _get_netgroups():
     '''
     '''
-  result = __salt__['netgroup.list']()
+    result = __salt__['netgroup.list']()
 
-  return result
+    return result
 
 def _get_loggedones():
     '''
     '''
-  cmd = 'last'
-  result = __salt__['cmd.run'](cmd, output_loglevel='quiet', python_shell=False)
+    cmd = 'last'
+    result = __salt__['cmd.run'](cmd, output_loglevel='quiet', python_shell=False)
 
-  return result
+    return result
 
 def _get_uptime():
     '''
     '''
-  cmd = 'uptime'
-  result = __salt__['cmd.run'](cmd, output_loglevel='quiet', python_shell=False)
+    cmd = 'uptime'
+    result = __salt__['cmd.run'](cmd, output_loglevel='quiet', python_shell=False)
 
-  return result
+    return result
 
+def _get_geo_cords():
+
+    location = _get_LOCATION()
+
+    geo_cords = 'none'
+
+    if location == 'basel':
+        geo_cords = 'u0mqkyqcj4cf'
+
+    if location == 'bern':
+      geo_cords = 'u0m5p3z0ffhk'
+
+    if location == 'bern_rz':
+      geo_cords = 'u0m5p3z0ffhk'
+
+    return geo_cords
+
+def _get_geo_iso_3166_2():
+
+    location = _get_LOCATION()
+
+    geo_iso = 'none'
+
+    if location == 'basel':
+        geo_iso = 'CH-BS'
+
+    if location == 'bern':
+        geo_iso = 'CH-BE'
+
+    return geo_iso
 
 def get_infos():
   ls_data = {}
@@ -813,6 +843,8 @@ def get_infos():
   ls_data['netgroups'] = str(_get_netgroups())
   ls_data['loggedones'] = str(_get_loggedones())
   ls_data['uptime'] = str(_get_uptime())
+  ls_data['geo_cords'] = str(_get_geo_cords())
+  ls_data['geo_iso'] = str(_get_geo_iso_3166_2())
 
   ls_host = 'svrl1btrfstst01.hs.coop.ch'
   ls_port = '9200'
