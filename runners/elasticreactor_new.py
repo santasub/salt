@@ -223,8 +223,8 @@ def WriteToEs(data, casetype, change_count, error_count, ids_w_ch, ids_w_er, pay
  es_data['master'] = master
  es_data['fun'] = job_fun
  es_data['jid'] = job_id
- es_data['_stateid_change'] = ids_w_ch
- es_data['_stateid_error'] = ids_w_er
+ es_data['a_stateid_change'] = ids_w_ch
+ es_data['a_stateid_error'] = ids_w_er
  es_data['data'] = payload
 
  es_host = config['es_host']
@@ -275,8 +275,8 @@ def WriteToLs(data, casetype, change_count, error_count, ids_w_ch, ids_w_er, pay
   ls_data['master'] = master
   ls_data['fun'] = job_fun
   ls_data['jid'] = job_id
-  ls_data['_stateid_change'] = ids_w_ch
-  ls_data['_stateid_error'] = ids_w_er
+  ls_data['a_stateid_change'] = ids_w_ch
+  ls_data['a_stateid_error'] = ids_w_er
   ls_data['data'] = payload
 
   try:
