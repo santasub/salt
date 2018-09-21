@@ -143,6 +143,8 @@ def log_stuff(data_str):
   change_count = 0
   dryrun = False
   casetype = 'none'
+  ids_w_ch = ''
+  ids_w_er = ''
   send_elastic = config['send_elastic']
   send_logstash = config['send_logstash']
 
@@ -152,9 +154,13 @@ def log_stuff(data_str):
         error = True
         error_count += 1
 
+        ids_w_er = ids_w_er + 'StateID: ' + str(ret['__id__'] + '\n')
+
       if ret['changes']:
         changes = True
         change_count +=1
+
+        ids_w_ch = ids_w_ch + 'StateID: ' + str(ret['__id__'] + '\n')
 
       # If test=true set DRYRUN
       if ret['result'] == None:
@@ -171,12 +177,12 @@ def log_stuff(data_str):
       error_count = 0
     else:
       casetype = 'ERROR'
-      
+
     if send_elastic:
-      WriteToEs(data, casetype, change_count, error_count, payload)
+      WriteToEs(data, casetype, change_count, error_count, ids_w_ch, ids_w_er, payload)
 
     if send_logstash:
-      WriteToLs(data, casetype, change_count, error_count, payload)
+      WriteToLs(data, casetype, change_count, error_count, ids_w_ch, ids_w_er, payload)
 
   if changes:
     payload = subprocess.check_output(["salt-run", "jobs.lookup_jid", data['jid']])
@@ -189,61 +195,63 @@ def log_stuff(data_str):
       casetype = 'CHANGE'
 
     if send_elastic:
-      WriteToEs(data, casetype, change_count, error_count, payload)
-         
+      WriteToEs(data, casetype, change_count, error_count, ids_w_ch, ids_w_er, payload)
+
     if send_logstash:
-      WriteToLs(data, casetype, change_count, error_count, payload)
+      WriteToLs(data, casetype, change_count, error_count, ids_w_ch, ids_w_er, payload)
 
   return True
 
-def WriteToEs(data, casetype, change_count, error_count, payload):
-  '''
-  Write the gathered data to an elasticsearch server
-  '''
-  config = _get_elasticreator_configuration()
-  utc = UTC()
-  master = os.uname()[1]
-  minion_name = data['id']
-  job_fun = data['fun']
-  job_id = data['jid']
+def WriteToEs(data, casetype, change_count, error_count, ids_w_ch, ids_w_er, payload):
+ '''
+ Write the gathered data to an elasticsearch server
+ '''
+ config = _get_elasticreator_configuration()
+ utc = UTC()
+ master = os.uname()[1]
+ minion_name = data['id']
+ job_fun = data['fun']
+ job_id = data['jid']
 
-  es_data = {}
+ es_data = {}
 
-  es_data['@timestamp'] = datetime.datetime.now(utc).isoformat()
-  es_data['case'] = casetype
-  es_data['change_count'] = change_count
-  es_data['error_count'] = error_count
-  es_data['minion'] = minion_name
-  es_data['master'] = master
-  es_data['fun'] = job_fun
-  es_data['jid'] = job_id
-  es_data['data'] = payload
+ es_data['@timestamp'] = datetime.datetime.now(utc).isoformat()
+ es_data['case'] = casetype
+ es_data['change_count'] = change_count
+ es_data['error_count'] = error_count
+ es_data['minion'] = minion_name
+ es_data['master'] = master
+ es_data['fun'] = job_fun
+ es_data['jid'] = job_id
+ es_data['_stateid_change'] = ids_w_ch
+ es_data['_stateid_error'] = ids_w_er
+ es_data['data'] = payload
 
-  es_host = config['es_host']
-  es_port = config['es_port']
-  es_index = config['es_index']
-  es_index_date = config['es_index_date']
-  es_doc_type= config['es_doc_type']
+ es_host = config['es_host']
+ es_port = config['es_port']
+ es_index = config['es_index']
+ es_index_date = config['es_index_date']
+ es_doc_type= config['es_doc_type']
 
-  if es_index_date:
-    es_index = '{0}-{1}'.format(es_index, datetime.date.today().strftime('%Y.%m.%d')) 
+ if es_index_date:
+    es_index = '{0}-{1}'.format(es_index, datetime.date.today().strftime('%Y.%m.%d'))
 
-  es = Elasticsearch([{'host': str(es_host),'port': int(es_port)}])
+ es = Elasticsearch([{'host': str(es_host),'port': int(es_port)}])
 
-  try:
-    es.index(index=es_index, doc_type=es_doc_type, body=json.dumps(es_data))
+ try:
+   es.index(index=es_index, doc_type=es_doc_type, body=json.dumps(es_data))
 
-  except TransportError as e:
-    # ignore already existing index
-    if e.error == 'index_already_exists_exception':
-      pass
-    else:
-      raise
+ except TransportError as e:
+  # ignore already existing index
+  if e.error == 'index_already_exists_exception':
+    pass
+  else:
+    raise
 
   #log.debug('es_host: ' + es_host + ' es_port: ' + es_port + ' es_index: ' + es_index + ' es_doc_type: ' + es_doc_type)
   return True
 
-def WriteToLs(data, casetype, change_count, error_count, payload):
+def WriteToLs(data, casetype, change_count, error_count, ids_w_ch, ids_w_er, payload):
   '''
   Write the gathered data to an elasticsearch server
   '''
@@ -258,7 +266,7 @@ def WriteToLs(data, casetype, change_count, error_count, payload):
   ls_port = config['ls_port']
 
   ls_data = {}
-   
+
   ls_data['@timestamp'] = datetime.datetime.now(utc).isoformat()
   ls_data['case'] = casetype
   ls_data['change_count'] = change_count
@@ -267,6 +275,8 @@ def WriteToLs(data, casetype, change_count, error_count, payload):
   ls_data['master'] = master
   ls_data['fun'] = job_fun
   ls_data['jid'] = job_id
+  ls_data['_stateid_change'] = ids_w_ch
+  ls_data['_stateid_error'] = ids_w_er
   ls_data['data'] = payload
 
   try:
