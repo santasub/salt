@@ -846,7 +846,7 @@ def get_infos():
   ls_data['geo_cords'] = str(_get_geo_cords())
   ls_data['geo_iso'] = str(_get_geo_iso_3166_2())
 
-  ls_host = 'svrl1btrfstst01.hs.coop.ch'
+  ls_host = 'SERVERNAME'
   ls_port = '9200'
   ls_index = 'system_info'
   ls_index_date = 'True'
